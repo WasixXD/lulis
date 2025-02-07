@@ -8,22 +8,13 @@ import (
 )
 
 func ints2slice(s int) []int {
-	numberLen := 11
-	tmp := make([]int, numberLen)
-	for c := 0; c < numberLen && s > 0; c++ {
-		tmp[c] = s % 10
+	tmp := make([]int, 11)
+	numberLen := 9
+	for c := 0; c < numberLen; c++ {
+		tmp[numberLen-c-1] = s % 10
 		s /= 10
 	}
 	return tmp
-}
-
-func sum(s []int) (sum int) {
-	sum = 0
-
-	for _, v := range s {
-		sum += v
-	}
-	return
 }
 
 func genCpfs(start int, end int, comm chan []int) {
@@ -31,14 +22,16 @@ func genCpfs(start int, end int, comm chan []int) {
 		nums := ints2slice(n)
 
 		value := 0
+		sum := 0
 
-		for i, n := range nums {
+		for i, n := range nums[:9] {
 			value += (10 - i) * n
+			sum += n
 		}
 
 		digit1 := (11 - (value % 11)) % 10
-		value2 := value + (sum(nums) + (digit1 * 2))
-		digit2 := (11 - (value2 % 11)) % 10
+		value += (sum + (digit1 * 2))
+		digit2 := (11 - (value % 11)) % 10
 
 		nums[9] = digit1
 		nums[10] = digit2
@@ -56,13 +49,12 @@ func minimun(a, b int) int {
 }
 
 func main() {
-	// cpfsTotal := int64(10e11)
 	cpfsTotal := int(10e8) // 0.1%
 	wait := sync.WaitGroup{}
-	nCpus := runtime.NumCPU() * 2
+	nCpus := runtime.NumCPU()
 	amount := cpfsTotal / nCpus
 
-	c := make(chan []int, nCpus)
+	c := make(chan []int, nCpus*1000)
 
 	go func() {
 		for v := range c {
