@@ -1,11 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"os"
 	"strconv"
 )
-
-const CPF = "48650757850"
 
 func strings2ints(s []string) []int {
 	tmp := make([]int, len(s))
@@ -16,6 +14,8 @@ func strings2ints(s []string) []int {
 	}
 	return tmp
 }
+
+var cache map[int]int
 
 func ints2slice(s int) []int {
 	numberLen := len(strconv.Itoa(s))
@@ -28,24 +28,53 @@ func ints2slice(s int) []int {
 	return tmp
 }
 
-func genCpfs(start int, end int) {
+func sum(s []int) (sum int) {
+	sum = 0
+
+	for _, v := range s {
+		sum += v
+	}
+	return
+}
+
+func ints2byte(s []int) []byte {
+	tmp := make([]byte, len(s)+1)
+	for i, v := range s {
+		tmp[i] = byte(v + '0')
+	}
+	return tmp
+}
+
+func genCpfs(start int, end int, file string) {
+	handle, _ := os.OpenFile(file, os.O_WRONLY, os.ModeAppend)
+
+	// var thisList strings.Builder
+
 	for n := start; n <= end; n++ {
-		fmt.Println(n, ints2slice(n))
+		nums := ints2slice(n)
+		value := 0
+		for i, n := range nums {
+			value += (10 - i) * n
+		}
 
-		for i
+		digit1 := (11 - (value % 11)) % 10
 
+		value2 := value + (sum(nums) + (digit1 * 2))
+		digit2 := (11 - (value2 % 11)) % 10
+
+		nums = append(nums, digit1)
+		nums = append(nums, digit2)
+		handle.Write(ints2byte(nums))
 	}
 }
 
 func main() {
-	genCpfs(100000000, 200000000)
-	// nums := strings2ints(strings.Split(CPF[0:len(CPF)-2], ""))
+	// cpfsTotal := int64(10e11)
+	// nCpus := runtime.NumCPU()
 
-	// value := 0
-	// for i, n := range nums {
-	// 	mult := (10 - i)
-	// 	value += mult * n
-	// }
+	// cache = make(map[int]int)
+	genCpfs(100000000, 200000000, "cpfs.txt")
+	// nums := strings2ints(strings.Split(CPF[0:len(CPF)-2], ""))
 
 	// digit1 := 11 - (value % 11)
 	// digit2 := 0
