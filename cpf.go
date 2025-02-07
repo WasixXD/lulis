@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"runtime"
 	"sync"
+	"time"
 )
 
 func ints2slice(s int) []int {
@@ -47,11 +49,12 @@ func minimun(a, b int) int {
 }
 
 func main() {
-	cpfsTotal := int(10e11)
+	cpfsTotal := int(10e9)
 	wait := sync.WaitGroup{}
 	nCpus := runtime.NumCPU()
 	amount := cpfsTotal / nCpus
 
+	start := time.Now()
 	for n := 0; n < nCpus; n++ {
 		// division of labor
 		start := n * amount
@@ -65,5 +68,7 @@ func main() {
 	}
 
 	wait.Wait()
+	end := time.Since(start)
+	fmt.Printf("Calculated: %d in %v\n", cpfsTotal, end)
 	// os.Exit(0)
 }
