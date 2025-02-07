@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"runtime"
 	"sync"
 )
@@ -17,7 +15,7 @@ func ints2slice(s int) []int {
 	return tmp
 }
 
-func genCpfs(start int, end int, comm chan []int) {
+func genCpfs(start int, end int) {
 	for n := start; n <= end; n++ {
 		nums := ints2slice(n)
 
@@ -36,7 +34,7 @@ func genCpfs(start int, end int, comm chan []int) {
 		nums[9] = digit1
 		nums[10] = digit2
 
-		comm <- nums
+		// comm <- nums
 	}
 
 }
@@ -49,18 +47,10 @@ func minimun(a, b int) int {
 }
 
 func main() {
-	cpfsTotal := int(10e8) // 0.1%
+	cpfsTotal := int(10e11)
 	wait := sync.WaitGroup{}
 	nCpus := runtime.NumCPU()
 	amount := cpfsTotal / nCpus
-
-	c := make(chan []int, nCpus*1000)
-
-	go func() {
-		for v := range c {
-			fmt.Println(v)
-		}
-	}()
 
 	for n := 0; n < nCpus; n++ {
 		// division of labor
@@ -70,9 +60,10 @@ func main() {
 		wait.Add(1)
 		go func(start int, end int) {
 			defer wait.Done()
-			genCpfs(start, end, c)
+			genCpfs(start, end)
 		}(start, end)
 	}
+
 	wait.Wait()
-	os.Exit(0)
+	// os.Exit(0)
 }
