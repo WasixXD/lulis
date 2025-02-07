@@ -3,28 +3,16 @@ package main
 import (
 	"fmt"
 	"os"
-	"strconv"
+	"runtime"
 	"sync"
 )
 
-func strings2ints(s []string) []int {
-	tmp := make([]int, len(s))
-
-	for i, v := range s {
-		num, _ := strconv.Atoi(v)
-		tmp[i] = num
-	}
-	return tmp
-}
-
-var cache map[int]int
-
 func ints2slice(s int) []int {
-	numberLen := 9
+	numberLen := 11
 	tmp := make([]int, numberLen)
 	for c := 0; c < numberLen && s > 0; c++ {
-		tmp[numberLen-1-c] = s % 10
-		s = int(s / 10)
+		tmp[c] = s % 10
+		s /= 10
 	}
 	return tmp
 }
@@ -38,16 +26,7 @@ func sum(s []int) (sum int) {
 	return
 }
 
-func ints2byte(s []int) []byte {
-	tmp := make([]byte, len(s))
-	for i, v := range s {
-		tmp[i] = byte(v + '0')
-	}
-	return tmp
-}
-
 func genCpfs(start int, end int, comm chan []int) {
-
 	for n := start; n <= end; n++ {
 		nums := ints2slice(n)
 
@@ -60,14 +39,16 @@ func genCpfs(start int, end int, comm chan []int) {
 		digit1 := (11 - (value % 11)) % 10
 		value2 := value + (sum(nums) + (digit1 * 2))
 		digit2 := (11 - (value2 % 11)) % 10
-		nums = append(nums, digit1, digit2)
+
+		nums[9] = digit1
+		nums[10] = digit2
 
 		comm <- nums
 	}
 
 }
 
-func minimun(a, b int64) int64 {
+func minimun(a, b int) int {
 	if a < b {
 		return a
 	}
@@ -76,11 +57,12 @@ func minimun(a, b int64) int64 {
 
 func main() {
 	// cpfsTotal := int64(10e11)
-	cpfsTotal := int64(10e8) // 0.1%
+	cpfsTotal := int(10e8) // 0.1%
 	wait := sync.WaitGroup{}
-	nCpus := int64(12)
+	nCpus := runtime.NumCPU() * 2
+	amount := cpfsTotal / nCpus
 
-	c := make(chan []int)
+	c := make(chan []int, nCpus)
 
 	go func() {
 		for v := range c {
@@ -88,20 +70,17 @@ func main() {
 		}
 	}()
 
-	for n := range nCpus {
+	for n := 0; n < nCpus; n++ {
 		// division of labor
-		amount := cpfsTotal / nCpus
-		start := (n + 1) * amount
+		start := n * amount
 		end := minimun(start+amount, cpfsTotal)
-		cpfsTotal -= amount
 
 		wait.Add(1)
 		go func(start int, end int) {
 			defer wait.Done()
 			genCpfs(start, end, c)
-		}(int(start), int(end))
+		}(start, end)
 	}
-
 	wait.Wait()
 	os.Exit(0)
 }
