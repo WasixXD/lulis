@@ -3,25 +3,14 @@ package main
 import (
 	"fmt"
 	"math"
+	"os"
 	"runtime"
 	"sync"
 	"time"
 )
 
-func ints2slice(s int) []int {
-	tmp := make([]int, 11)
-	numberLen := 9
-	for c := 0; c < numberLen; c++ {
-		tmp[numberLen-c-1] = s % 10
-		s /= 10
-	}
-	return tmp
-}
-
 func genCpfs(start int, end int) {
 	for n := start; n <= end; n++ {
-		nums := make([]int, 11)
-
 		value := 0
 		sum := 0
 
@@ -35,22 +24,14 @@ func genCpfs(start int, end int) {
 		value += (sum + (digit1 * 2))
 		digit2 := (11 - (value % 11)) % 10
 
-		nums[9] = digit1
-		nums[10] = digit2
-
+		// fast concat
+		_ = ((n*10+digit1)*10 + digit2)
 	}
 
-}
-
-func minimun(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
 
 func main() {
-	cpfsTotal := int(10e10)
+	cpfsTotal := int(10e11)
 	wait := sync.WaitGroup{}
 	nCpus := runtime.NumCPU()
 	amount := cpfsTotal / nCpus
@@ -59,7 +40,7 @@ func main() {
 	for n := 0; n < nCpus; n++ {
 		// division of labor
 		start := n * amount
-		end := minimun(start+amount, cpfsTotal)
+		end := min(start+amount, cpfsTotal)
 
 		wait.Add(1)
 		go func(start int, end int) {
@@ -71,5 +52,6 @@ func main() {
 	wait.Wait()
 	end := time.Since(start)
 	fmt.Printf("Calculated: %d in %v\n", cpfsTotal, end)
-	// os.Exit(0)
+	os.Exit(0)
+
 }

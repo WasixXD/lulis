@@ -1,6 +1,6 @@
 # Calculating available CPFS
 
-10e10 = 7 minutes
-10e9  = 1 minute
-10e8  = 4 seconds
-10e7  = 400ms
+10e10 = 2 minutes \
+10e9  = 13 seconds \
+10e8  = 2 seconds \
+10e7  = 200ms \
