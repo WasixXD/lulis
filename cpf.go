@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"runtime"
 	"sync"
 	"time"
@@ -19,14 +20,15 @@ func ints2slice(s int) []int {
 
 func genCpfs(start int, end int) {
 	for n := start; n <= end; n++ {
-		nums := ints2slice(n)
+		nums := make([]int, 11)
 
 		value := 0
 		sum := 0
 
-		for i, n := range nums[:9] {
-			value += (10 - i) * n
-			sum += n
+		for i := 0; i < 9; i++ {
+			num := (n / int(math.Pow10(i))) % 10
+			value += (10 - i) * num
+			sum += num
 		}
 
 		digit1 := (11 - (value % 11)) % 10
@@ -36,7 +38,6 @@ func genCpfs(start int, end int) {
 		nums[9] = digit1
 		nums[10] = digit2
 
-		// comm <- nums
 	}
 
 }
@@ -49,7 +50,7 @@ func minimun(a, b int) int {
 }
 
 func main() {
-	cpfsTotal := int(10e9)
+	cpfsTotal := int(10e10)
 	wait := sync.WaitGroup{}
 	nCpus := runtime.NumCPU()
 	amount := cpfsTotal / nCpus
