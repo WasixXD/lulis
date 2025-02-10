@@ -15,7 +15,7 @@ func genCpfs(start int, end int) {
 		sum := 0
 
 		for i := 0; i < 9; i++ {
-			num := (n / int(math.Pow10(i))) % 10
+			num := (n / int(math.Pow10(8-i))) % 10
 			value += (10 - i) * num
 			sum += num
 		}
@@ -23,15 +23,13 @@ func genCpfs(start int, end int) {
 		digit1 := (11 - (value % 11)) % 10
 		value += (sum + (digit1 * 2))
 		digit2 := (11 - (value % 11)) % 10
-
-		// fast concat
-		_ = ((n*10+digit1)*10 + digit2)
+		fmt.Printf("%d%d%d\n", n, digit1, digit2)
 	}
 
 }
 
 func main() {
-	cpfsTotal := int(10e9)
+	cpfsTotal := int(10e8)
 	wait := sync.WaitGroup{}
 	nCpus := runtime.NumCPU()
 	amount := cpfsTotal / nCpus
@@ -39,7 +37,7 @@ func main() {
 	start := time.Now()
 	for n := 0; n < nCpus; n++ {
 		// division of labor
-		start := n * amount
+		start := (n + 1) * amount
 		end := min(start+amount, cpfsTotal)
 
 		wait.Add(1)
