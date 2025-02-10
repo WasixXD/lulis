@@ -31,7 +31,7 @@ func genCpfs(start int, end int) {
 }
 
 func main() {
-	cpfsTotal := int(10e8)
+	cpfsTotal := int(10e11)
 	wait := sync.WaitGroup{}
 	nCpus := runtime.NumCPU()
 	amount := cpfsTotal / nCpus
