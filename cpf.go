@@ -56,7 +56,7 @@ func genCpfs(start int, end int) {
 	}
 }
 
-func main() {
+func old() {
 	f, _ := os.Create("cpu.prof")
 	defer f.Close()
 
