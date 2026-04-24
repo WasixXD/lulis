@@ -2,36 +2,43 @@ package main
 
 import "testing"
 
-var pow10bench = pow10table
-
-func BenchmarkWeightedSum(b *testing.B) {
-	n := 123456789
+func BenchmarkAritmeticLoop(b *testing.B) {
+	var n [9]int = [9]int{0, 0, 0, 0, 0, 0, 0, 0, 1}
 	for b.Loop() {
-		value := 0
 		sum := 0
+		baseSum := 0
 		for i := 0; i < 9; i++ {
-			num := (n / pow10bench[8-i]) % 10
-			value += (10 - i) * num
-			sum += num
+			digit := n[i]
+			sum += digit * (10 - i)
+			baseSum += digit
 		}
 	}
 }
 
-func BenchmarkDigitCalc(b *testing.B) {
-	n := uint64(123456789)
-
+func BenchmarkDoubleVarLoop(b *testing.B) {
+	var n [9]int = [9]int{0, 0, 0, 0, 0, 0, 0, 0, 1}
 	for b.Loop() {
-		x := n
-
-		sum := uint64(0)
-		value := uint64(0)
-
-		for i := 0; i < 9; i++ {
-			num := mod10(x)
-			x = div10(x)
-
-			value += uint64(i+2) * num
-			sum += num
+		sum := 0
+		baseSum := 0
+		for i, j := 0, 10; i < 9; i, j = i+1, j-1 {
+			digit := n[i]
+			sum += digit * j
+			baseSum += digit
 		}
 	}
+}
+
+func BenchmarkNoBoundCheck(b *testing.B) {
+
+	var n [9]int = [9]int{0, 0, 0, 0, 0, 0, 0, 0, 1}
+
+	for b.Loop() {
+		sum := 0
+		baseSum := 0
+		for i, digit := range &n {
+			sum += digit * (10 - i)
+			baseSum += digit
+		}
+	}
+
 }

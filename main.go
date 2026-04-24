@@ -1,8 +1,11 @@
 package main
 
 import (
+	"log"
+	"os"
+	"runtime/pprof"
 	"strconv"
-	"strings"
+	"time"
 )
 
 func toDigits(arr []string) []int {
@@ -14,23 +17,21 @@ func toDigits(arr []string) []int {
 	return digits
 }
 
-func calc2Digits(n []string) []string {
-	// ABCDEFGHI
-	var local int
-	digits := toDigits(n)
+func calc2Digits(digits *[9]int) []string {
 
 	sum := 0
 	// holds A+B+C+D+E+F+G+H+I
 	baseSum := 0
-	for i := 0; i < len(digits); i++ {
-		sum += digits[i] * (10 - i)
-		baseSum += digits[i]
+	for i, j := 0, 10; i < 9; i, j = i+1, j-1 {
+		digit := digits[i]
+		sum += digit * j
+		baseSum += digit
 	}
+
 	// digit1 is (10A + 9B + 8C + 7D + 6E + 5F + 4G + 3H + 2I) % 11
 	rem := sum % 11
 	digit1 := 11 - rem
 	if rem == 0 || rem == 1 {
-
 		digit1 = 0
 	}
 
@@ -45,18 +46,40 @@ func calc2Digits(n []string) []string {
 	if rem == 0 || rem == 1 {
 		digit2 = 0
 	}
-	local += digit1 + digit2
+
+	_, _ = digit1, digit2
+	// fmt.Println(digits, digit1, digit2)
 
 	return []string{}
 }
 
 func main() {
+	f, _ := os.Create("cpu.prof")
+
+	if err := pprof.StartCPUProfile(f); err != nil {
+		log.Fatal(err)
+	}
+
+	deadline := time.Now().Add(10 * time.Second)
+
+	var digits [9]int
 	for i := 1; i < 999_999_999; i++ {
-		n := strings.Split(strconv.Itoa(i), "")
-		for len(n) != 9 {
-			n = append([]string{"0"}, n...)
+
+		if time.Now().After(deadline) {
+			break
 		}
 
-		calc2Digits(n)
+		for i := 8; i >= 0; i-- {
+			digits[i]++
+			if digits[i] < 10 {
+				break
+			}
+			digits[i] = 0
+		}
+
+		calc2Digits(&digits)
 	}
+
+	pprof.StopCPUProfile()
+	f.Close()
 }
