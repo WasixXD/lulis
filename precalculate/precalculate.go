@@ -1,0 +1,5 @@
+package precalculate
+
+func preCalculate() {
+
+}

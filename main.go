@@ -5,7 +5,6 @@ import (
 	"os"
 	"runtime/pprof"
 	"strconv"
-	"time"
 )
 
 func toDigits(arr []string) []int {
@@ -18,6 +17,7 @@ func toDigits(arr []string) []int {
 }
 
 func calc2Digits(digits *[9]int) []string {
+	var local int
 
 	sum := 0
 	// holds A+B+C+D+E+F+G+H+I
@@ -47,7 +47,7 @@ func calc2Digits(digits *[9]int) []string {
 		digit2 = 0
 	}
 
-	_, _ = digit1, digit2
+	local += digit1 + digit2
 	// fmt.Println(digits, digit1, digit2)
 
 	return []string{}
@@ -60,14 +60,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	deadline := time.Now().Add(10 * time.Second)
-
 	var digits [9]int
 	for i := 1; i < 999_999_999; i++ {
-
-		if time.Now().After(deadline) {
-			break
-		}
 
 		for i := 8; i >= 0; i-- {
 			digits[i]++
