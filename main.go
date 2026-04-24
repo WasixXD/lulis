@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"runtime/pprof"
 	"strconv"
+	"time"
 )
 
 func toDigits(arr []string) []int {
@@ -17,10 +19,10 @@ func toDigits(arr []string) []int {
 }
 
 func calc2Digits(digits *[9]int) []string {
-	var local int
 
 	sum := 0
-	// holds A+B+C+D+E+F+G+H+I
+
+	// Holds A+B+C+D+E+F+G+H+I
 	baseSum := 0
 	for i, j := 0, 10; i < 9; i, j = i+1, j-1 {
 		digit := digits[i]
@@ -47,7 +49,7 @@ func calc2Digits(digits *[9]int) []string {
 		digit2 = 0
 	}
 
-	local += digit1 + digit2
+	_, _ = digit1, digit2
 	// fmt.Println(digits, digit1, digit2)
 
 	return []string{}
@@ -61,8 +63,15 @@ func main() {
 	}
 
 	var digits [9]int
+	now := time.Now()
 	for i := 1; i < 999_999_999; i++ {
 
+		// Instead of creating an array every loop
+		// we use just one and increments its bits one by one
+		// 0 0 0 0 0 0 0 0 1
+		// 0 0 0 0 0 0 0 0 2
+		// ...
+		// 0 0 0 0 0 0 0 1 0
 		for i := 8; i >= 0; i-- {
 			digits[i]++
 			if digits[i] < 10 {
@@ -71,9 +80,11 @@ func main() {
 			digits[i] = 0
 		}
 
+		// let pass a pointer to not copy the slice
 		calc2Digits(&digits)
 	}
 
 	pprof.StopCPUProfile()
 	f.Close()
+	fmt.Println("Finished in: ", time.Since(now))
 }
