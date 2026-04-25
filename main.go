@@ -5,18 +5,8 @@ import (
 	"log"
 	"os"
 	"runtime/pprof"
-	"strconv"
 	"time"
 )
-
-func toDigits(arr []string) []int {
-	digits := make([]int, len(arr))
-	for i := range arr {
-		num, _ := strconv.Atoi(arr[i])
-		digits[i] = num
-	}
-	return digits
-}
 
 func calc2Digits(digits *[9]int) []string {
 
@@ -32,10 +22,7 @@ func calc2Digits(digits *[9]int) []string {
 
 	// digit1 is (10A + 9B + 8C + 7D + 6E + 5F + 4G + 3H + 2I) % 11
 	rem := sum % 11
-	digit1 := 11 - rem
-	if rem == 0 || rem == 1 {
-		digit1 = 0
-	}
+	digit1 := remTable[rem]
 
 	// digit2 is 11A + 10B + 9C + 8D + 7E + 6F + 5G + 4H + 3I + 2J
 	// but can also be written as:
@@ -44,10 +31,7 @@ func calc2Digits(digits *[9]int) []string {
 	sum += baseSum + 2*digit1
 
 	rem = sum % 11
-	digit2 := 11 - rem
-	if rem == 0 || rem == 1 {
-		digit2 = 0
-	}
+	digit2 := remTable[rem]
 
 	_, _ = digit1, digit2
 	// fmt.Println(digits, digit1, digit2)

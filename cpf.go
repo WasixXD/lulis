@@ -24,6 +24,20 @@ var pow10table = []int{
 	1e10,
 }
 
+var remTable = [11]int{
+	0:  0,
+	1:  0,
+	2:  9,
+	3:  8,
+	4:  7,
+	5:  6,
+	6:  5,
+	7:  4,
+	8:  3,
+	9:  2,
+	10: 1,
+}
+
 func div10(n uint64) uint64 {
 	return (n * 0xCCCCCCCCCCCCCCCD) >> 67
 }
