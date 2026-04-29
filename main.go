@@ -2,32 +2,44 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"lulis/cpf"
-	"os"
-	"runtime/pprof"
+	"runtime"
+	"sync"
 	"time"
 )
 
+const MAX_CPFS = 10e8 - 1 // 1_000_000_000 - 1 = 999_999_999
 var sink int
 
 func main() {
-	f, _ := os.Create("cpu.prof")
-
-	if err := pprof.StartCPUProfile(f); err != nil {
-		log.Fatal(err)
-	}
-
+	numCores := runtime.NumCPU()
+	cpfPerBatch := MAX_CPFS / numCores
+	wait := sync.WaitGroup{}
 	now := time.Now()
-	sink = cpf.CalcRange(0, 999_999_999)
-	fmt.Println(sink)
-	fmt.Println("CalcRange Finished in: ", time.Since(now))
+	for i := range numCores {
+		start := i * cpfPerBatch
+		end := start + cpfPerBatch - 1
+		if i == numCores-1 {
+			end = MAX_CPFS
+		}
 
-	// now = time.Now()
-	// sink = cpf.DebugCPF(0, 999_999_999)
-	// fmt.Println(sink)
-	// fmt.Println("DebugCPF Finished in: ", time.Since(now))
+		wait.Add(1)
 
-	pprof.StopCPUProfile()
-	f.Close()
+		go func(start, end int) {
+			defer wait.Done()
+			cpf.CalcRange(start, end)
+		}(start, end)
+
+	}
+	wait.Wait()
+	fmt.Println("Multiple threads ", time.Since(now))
+
+	start := time.Now()
+	sink = cpf.CalcRange(0, MAX_CPFS)
+	fmt.Println("SingleThreaded", time.Since(start))
+
+	now = time.Now()
+	sink = cpf.GenCpfs(0, MAX_CPFS)
+	fmt.Println("Old implementation", time.Since(start))
+
 }

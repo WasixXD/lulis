@@ -119,6 +119,13 @@ func DebugCPF(start, end int) int {
 	return local
 }
 
+func intToDigits(start int, digits *[CPF_DIGITS]int) {
+	for i := 0; i < 9; i++ {
+		num := (start / pow10table[8-i]) % 10
+		digits[i] = num
+	}
+}
+
 func increaseDigit(digits *[CPF_DIGITS]int) {
 	for i := 8; i >= 0; i-- {
 		digits[i]++
@@ -161,6 +168,7 @@ func CalcRange(start, end int) int {
 	var digits [CPF_DIGITS]int
 	var local int
 
+	intToDigits(start, &digits)
 	// first batch lets calc the first 9
 	for current := start + 1; current < BatchSize; current++ {
 		increaseDigit(&digits)
@@ -232,7 +240,7 @@ func CalcRange(start, end int) int {
 // 	return local
 // }
 
-func genCpfs(start int, end int) {
+func GenCpfs(start int, end int) int {
 	var local int
 
 	for n := start; n <= end; n++ {
@@ -251,6 +259,7 @@ func genCpfs(start int, end int) {
 
 		local += digit1 + digit2
 	}
+	return local
 }
 
 func old() {
@@ -275,7 +284,7 @@ func old() {
 		wait.Add(1)
 		go func(start int, end int) {
 			defer wait.Done()
-			genCpfs(start, end)
+			GenCpfs(start, end)
 		}(start, end)
 	}
 
