@@ -1,1 +1,11 @@
 cpfs.txt
+
+# compiled binaries
+lulis
+cpf_debug
+
+# profiling output
+*.prof
+
+# test binary artifacts
+*.test

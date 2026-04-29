@@ -1,55 +1,48 @@
-package main
+package dots
 
-var weights = [9]int{10, 9, 8, 7, 6, 5, 4, 3, 2}
+const BatchSize = 10
 
-func DotNaive(a [BATCH_SIZE][9]int, b [9]int) int {
+func Naive(a [BatchSize][9]int, b [9]int) int {
 	sum := 0
-
-	for i, x := 0, 0; i < 9 && x < BATCH_SIZE; i, x = i+1, x+1 {
+	for i, x := 0, 0; i < 9 && x < BatchSize; i, x = i+1, x+1 {
 		sum += a[x][i] * b[i]
 	}
-
 	return sum
 }
 
-func DotUnroll(a [BATCH_SIZE][9]int, b [9]int) int {
+func Unroll(a [BatchSize][9]int, b [9]int) int {
 	sum := 0
-
-	for x := 0; x < BATCH_SIZE; x++ {
+	for x := 0; x < BatchSize; x++ {
 		sum +=
 			a[x][0]*b[0] +
 				a[x][1]*b[1] +
 				a[x][2]*b[2] +
-
 				a[x][3]*b[3] +
 				a[x][4]*b[4] +
 				a[x][5]*b[5] +
-
 				a[x][6]*b[6] +
 				a[x][7]*b[7] +
 				a[x][8]*b[8]
 	}
-
 	return sum
 }
-func DotBCE(a [BATCH_SIZE][9]int, b [9]int) int {
-	sum := 0
 
-	for x := 0; x < BATCH_SIZE; x++ {
+func BCE(a [BatchSize][9]int, b [9]int) int {
+	sum := 0
+	for x := 0; x < BatchSize; x++ {
 		for i := 0; i < 9; i += 3 {
 			aTmp := a[x][i : i+3 : i+3]
 			bTmp := b[i : i+3 : i+3]
-
 			sum +=
 				aTmp[0]*bTmp[0] +
 					aTmp[1]*bTmp[1] +
 					aTmp[2]*bTmp[2]
 		}
 	}
-
 	return sum
 }
-func DotFullUnroll(a [4][9]int, b [9]int) int {
+
+func FullUnroll(a [4][9]int, b [9]int) int {
 	return (a[0][0]*b[0] +
 		a[0][1]*b[1] +
 		a[0][2]*b[2] +
@@ -91,9 +84,8 @@ func DotFullUnroll(a [4][9]int, b [9]int) int {
 		a[3][8]*b[8])
 }
 
-func Dot4(a [4][9]int, b [9]int) (int, int, int, int) {
+func Dot4(a [BatchSize][9]int, b [9]int) (int, int, int, int) {
 	var s0, s1, s2, s3 int
-
 	for i := 0; i < 9; i++ {
 		w := b[i]
 		s0 += a[0][i] * w
@@ -101,6 +93,16 @@ func Dot4(a [4][9]int, b [9]int) (int, int, int, int) {
 		s2 += a[2][i] * w
 		s3 += a[3][i] * w
 	}
+	return s0, s1, s2, s3
+}
 
+func Sum4(a [BatchSize][9]int) (int, int, int, int) {
+	var s0, s1, s2, s3 int
+	for i := 0; i < 9; i++ {
+		s0 += a[0][i]
+		s1 += a[1][i]
+		s2 += a[2][i]
+		s3 += a[3][i]
+	}
 	return s0, s1, s2, s3
 }

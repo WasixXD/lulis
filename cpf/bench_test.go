@@ -1,4 +1,4 @@
-package main
+package cpf
 
 import "testing"
 
@@ -12,6 +12,8 @@ func BenchmarkAritmeticLoop(b *testing.B) {
 			sum += digit * (10 - i)
 			baseSum += digit
 		}
+		_ = sum
+		_ = baseSum
 	}
 }
 
@@ -25,13 +27,13 @@ func BenchmarkDoubleVarLoop(b *testing.B) {
 			sum += digit * j
 			baseSum += digit
 		}
+		_ = sum
+		_ = baseSum
 	}
 }
 
 func BenchmarkNoBoundCheck(b *testing.B) {
-
 	var n [9]int = [9]int{0, 0, 0, 0, 0, 0, 0, 0, 1}
-
 	for b.Loop() {
 		sum := 0
 		baseSum := 0
@@ -39,6 +41,7 @@ func BenchmarkNoBoundCheck(b *testing.B) {
 			sum += digit * (10 - i)
 			baseSum += digit
 		}
+		_ = sum
+		_ = baseSum
 	}
-
 }
